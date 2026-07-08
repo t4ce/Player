@@ -1,0 +1,9 @@
+(function() {
+    const implementors = Object.fromEntries([["player_tui",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/panic/unwind_safe/trait.RefUnwindSafe.html\" title=\"trait core::panic::unwind_safe::RefUnwindSafe\">RefUnwindSafe</a> for <a class=\"enum\" href=\"player_tui/control/enum.Command.html\" title=\"enum player_tui::control::Command\">Command</a>",0,1,["player_tui::control::Command"]],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/panic/unwind_safe/trait.RefUnwindSafe.html\" title=\"trait core::panic::unwind_safe::RefUnwindSafe\">RefUnwindSafe</a> for <a class=\"enum\" href=\"player_tui/control/enum.ParseCommandError.html\" title=\"enum player_tui::control::ParseCommandError\">ParseCommandError</a>",0,1,["player_tui::control::ParseCommandError"]],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/panic/unwind_safe/trait.RefUnwindSafe.html\" title=\"trait core::panic::unwind_safe::RefUnwindSafe\">RefUnwindSafe</a> for <a class=\"struct\" href=\"player_tui/control/struct.CommandSpec.html\" title=\"struct player_tui::control::CommandSpec\">CommandSpec</a>",0,1,["player_tui::control::CommandSpec"]],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/panic/unwind_safe/trait.RefUnwindSafe.html\" title=\"trait core::panic::unwind_safe::RefUnwindSafe\">RefUnwindSafe</a> for <a class=\"struct\" href=\"player_tui/control/struct.ParsedCommand.html\" title=\"struct player_tui::control::ParsedCommand\">ParsedCommand</a>",0,1,["player_tui::control::ParsedCommand"]]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":59,"fragment_lengths":[1524]}

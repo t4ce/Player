@@ -1,3 +1,10 @@
+//! Command parsing and dispatch for the player UI.
+//!
+//! This module is intentionally small and backend-agnostic. The UI can parse
+//! prompt input into a [`ParsedCommand`], then dispatch it into any type that
+//! implements [`ControlEventHandler`].
+
+/// All commands currently represented by the UI and prompt parser.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Command {
     Load,
@@ -36,6 +43,7 @@ pub enum Command {
 }
 
 impl Command {
+    /// Returns the canonical prompt name for this command.
     pub const fn name(self) -> &'static str {
         match self {
             Self::Load => "load",
@@ -75,12 +83,16 @@ impl Command {
     }
 }
 
+/// Canonical command plus accepted aliases.
 #[derive(Debug, Clone, Copy)]
 pub struct CommandSpec {
+    /// The command routed by this spec.
     pub command: Command,
+    /// Extra names accepted by the parser.
     pub aliases: &'static [&'static str],
 }
 
+/// Commands and aliases accepted by [`parse_command`].
 pub const COMMAND_SPECS: &[CommandSpec] = &[
     CommandSpec {
         command: Command::Load,
@@ -216,33 +228,43 @@ pub const COMMAND_SPECS: &[CommandSpec] = &[
     },
 ];
 
+/// A parsed command action plus the remaining prompt arguments.
 #[derive(Debug, Clone)]
 pub struct ParsedCommand {
+    /// Resolved command.
     pub command: Command,
     #[allow(dead_code)]
     pub raw: String,
     #[allow(dead_code)]
     pub raw_action: String,
+    /// Whitespace-separated arguments after the command/action.
     pub args: Vec<String>,
 }
 
 impl ParsedCommand {
+    /// Returns an argument by index.
     pub fn arg(&self, index: usize) -> Option<&str> {
         self.args.get(index).map(String::as_str)
     }
 
+    /// Joins all arguments back into one space-separated string.
     pub fn rest(&self) -> String {
         self.args.join(" ")
     }
 }
 
+/// Errors returned by [`parse_command`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParseCommandError {
+    /// The prompt contained no command text.
     Empty,
+    /// The action did not match any command or alias.
     Unknown(String),
+    /// A short alias matched more than one command.
     Ambiguous { input: String, matches: Vec<String> },
 }
 
+/// Parses prompt text into a command event.
 pub fn parse_command(input: &str) -> Result<ParsedCommand, ParseCommandError> {
     let raw = input.trim();
     if raw.is_empty() {
@@ -262,6 +284,7 @@ pub fn parse_command(input: &str) -> Result<ParsedCommand, ParseCommandError> {
     })
 }
 
+/// Returns all canonical command names as a slash-separated help string.
 pub fn command_names() -> String {
     COMMAND_SPECS
         .iter()
@@ -301,6 +324,7 @@ fn resolve_command(action: &str) -> Result<Command, ParseCommandError> {
     Err(ParseCommandError::Unknown(action.to_owned()))
 }
 
+/// Event sink implemented by the UI or a future playback backend.
 pub trait ControlEventHandler {
     fn on_load(&mut self, _event: &ParsedCommand) {}
     fn on_play(&mut self, _event: &ParsedCommand) {}
@@ -337,6 +361,7 @@ pub trait ControlEventHandler {
     fn on_help(&mut self, _event: &ParsedCommand) {}
 }
 
+/// Routes a parsed command to the matching [`ControlEventHandler`] callback.
 pub fn dispatch(handler: &mut impl ControlEventHandler, event: &ParsedCommand) {
     match event.command {
         Command::Load => handler.on_load(event),

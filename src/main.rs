@@ -33,7 +33,8 @@ use scope::{
 };
 
 mod cmd_boxes;
-mod control;
+
+use player_tui::control;
 
 const SPINNER: [&str; 8] = ["⢈", "⡈", "⡐", "⡠", "⣀", "⢄", "⢂", "⢁"];
 const HOTKEYS_ENABLED: bool = false;

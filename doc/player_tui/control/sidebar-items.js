@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["COMMAND_SPECS"],"enum":["Command","ParseCommandError"],"fn":["command_names","dispatch","parse_command","resolve_command"],"struct":["CommandSpec","ParsedCommand"],"trait":["ControlEventHandler"]};

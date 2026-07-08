@@ -2,6 +2,14 @@
 name = "player-tui"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.85"
+description = "A Ratatui demo shell for an audio player, focused on command flow and terminal UI layout."
+license = "MIT"
+readme = "README.md"
+documentation = "https://docs.rs/player-tui"
+keywords = ["tui", "audio", "player", "ratatui"]
+categories = ["command-line-utilities"]
+exclude = ["doc/", "Screenshot.png"]
 
 [dependencies]
 anyhow = "1.0"
