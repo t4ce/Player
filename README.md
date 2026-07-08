@@ -6,7 +6,7 @@ visual demos. Media playback, recording, saving, and transcription are
 visual/logged flows only. Expect a finetuned rich Terminal UI where every command waits for you to wire
 as your platform desires.
 
-![player-scope screenshot](doc/Screenshot.png)
+![player-scope screenshot](https://raw.githubusercontent.com/t4ce/Player/true/doc/Screenshot.png)
 
 ## Run
 

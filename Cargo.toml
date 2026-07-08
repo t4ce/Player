@@ -1,12 +1,13 @@
 [package]
 name = "player-scope"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.85"
 description = "A Ratatui demo shell for an audio player, focused on command flow and terminal UI layout."
 license = "MIT"
 readme = "README.md"
 documentation = "https://docs.rs/player-scope"
+repository = "https://github.com/t4ce/Player"
 keywords = ["tui", "audio", "player", "ratatui"]
 categories = ["command-line-utilities"]
 include = [
