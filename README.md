@@ -1,14 +1,17 @@
 # player-tui
 
-`player-tui` is a Ratatui prototype for an audio player interface. It focuses on
+`player-tui` is a Ratatui UI-Only for an audio player interface. It focuses on
 layout, command parsing, status feedback, playlist browsing, and scope-style
-visual demos. Media playback, recording, saving, and transcription are currently
-visual/logged flows only.
+visual demos. Media playback, recording, saving, and transcription are
+visual/logged flows only. Expect a finetuned rich Terminal UI where every command waits for you to wire
+as your platform desires.
+
+![player-tui screenshot](doc/Screenshot.png)
 
 ## Run
 
 ```sh
-cargo run
+cargo run --example demo
 ```
 
 ## Command API
@@ -19,7 +22,7 @@ The `control` module is the integration surface for future backend logic:
 - `dispatch` routes parsed commands into a `ControlEventHandler`.
 - `COMMAND_SPECS` lists the supported commands and aliases.
 
-The binary implements `ControlEventHandler` with demo behavior today. A real
+The demo implements `ControlEventHandler` with visual behavior today. A real
 backend can implement the same trait to connect playback, recording, saving,
 playlist, and scope logic later.
 

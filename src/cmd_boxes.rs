@@ -9,7 +9,7 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph},
 };
 
-use crate::{COMMAND_FG, FLASH_BG, FLASH_FG, HOTKEY_FINAL_BG, HOTKEY_STATE};
+use super::{COMMAND_FG, FLASH_BG, FLASH_FG, HOTKEY_FINAL_BG, HOTKEY_STATE};
 
 const COMPACT_CELL_WIDTH: usize = 6;
 

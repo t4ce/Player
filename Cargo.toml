@@ -9,7 +9,19 @@ readme = "README.md"
 documentation = "https://docs.rs/player-tui"
 keywords = ["tui", "audio", "player", "ratatui"]
 categories = ["command-line-utilities"]
-exclude = ["doc/", "Screenshot.png"]
+include = [
+    "Cargo.toml",
+    "Cargo.lock",
+    "LICENSE",
+    "README.md",
+    "src/**/*",
+    "demo/**/*",
+    "doc/Screenshot.png",
+]
+
+[[example]]
+name = "demo"
+path = "demo/main.rs"
 
 [dependencies]
 anyhow = "1.0"

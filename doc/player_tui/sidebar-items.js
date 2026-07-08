@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["control"]};
+window.SIDEBAR_ITEMS = {"mod":["control","ui"]};

@@ -1,2 +1,2 @@
-createSrcSidebar('[["player_tui",["",[],["control.rs","lib.rs"]]]]');
-//{"start":19,"fragment_lengths":[46]}
+createSrcSidebar('[["player_tui",["",[],["cmd_boxes.rs","control.rs","lib.rs","ui.rs"]]]]');
+//{"start":19,"fragment_lengths":[69]}

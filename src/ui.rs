@@ -32,9 +32,10 @@ use scope::{
     input::Matrix,
 };
 
+#[path = "cmd_boxes.rs"]
 mod cmd_boxes;
 
-use player_tui::control;
+use crate::control;
 
 const SPINNER: [&str; 8] = ["⢈", "⡈", "⡐", "⡠", "⣀", "⢄", "⢂", "⢁"];
 const HOTKEYS_ENABLED: bool = false;
@@ -55,11 +56,55 @@ const PROMPT_PREFIX: &str = "┠╴╶╴ ─╴ ╶── ╶───Prompt �
 const SYSTEM_SUFFIX: &str = "├─── System───╴ ──╴ ╶─ ╶╴╶";
 const SYSTEM_EDGE: &str = "┨";
 
-fn main() -> Result<()> {
+/// Runs the terminal UI with the provided data/configuration.
+pub fn run(config: UiConfig) -> Result<()> {
     let mut terminal = setup_terminal()?;
-    let result = App::default().run(&mut terminal);
+    let result = App::new(config).run(&mut terminal);
     restore_terminal(&mut terminal)?;
     result
+}
+
+/// Initial state and demo data used by the terminal UI.
+#[derive(Debug, Clone)]
+pub struct UiConfig {
+    pub ready_response: String,
+    pub default_file_path: String,
+    pub next_file_path: String,
+    pub default_track: TrackData,
+    pub next_track: TrackData,
+    pub initial_volume: u16,
+    pub initial_gain: i16,
+    pub initial_pitch: i16,
+    pub initial_progress_secs: u64,
+    pub next_progress_secs: u64,
+    pub default_duration_secs: u64,
+    pub next_duration_secs: u64,
+    pub initial_loop_range: Option<(u64, u64)>,
+    pub logs: Vec<String>,
+    pub playlist_entries: Vec<PlaylistEntryData>,
+}
+
+/// Track metadata displayed in the Playback panel.
+#[derive(Debug, Clone)]
+pub struct TrackData {
+    pub file: String,
+    pub album: String,
+    pub artist: String,
+    pub codec: String,
+    pub bitrate: String,
+    pub sample_rate: String,
+    pub channels: String,
+    pub size: String,
+}
+
+/// One row in the playlist demo table.
+#[derive(Debug, Clone)]
+pub struct PlaylistEntryData {
+    pub icon: String,
+    pub name: String,
+    pub kind: String,
+    pub duration: String,
+    pub size: String,
 }
 
 fn setup_terminal() -> Result<Terminal<CrosstermBackend<io::Stdout>>> {
@@ -118,6 +163,14 @@ struct App {
     last_tick: Instant,
     last_progress_tick: Instant,
     should_quit: bool,
+    default_file_path: String,
+    next_file_path: String,
+    default_track: Track,
+    next_track: Track,
+    default_progress_secs: u64,
+    next_progress_secs: u64,
+    default_duration_secs: u64,
+    next_duration_secs: u64,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -126,33 +179,36 @@ enum ScopeMode {
     Spectroscope,
 }
 
-impl Default for App {
-    fn default() -> Self {
+impl App {
+    fn new(config: UiConfig) -> Self {
         let now = Instant::now();
+        let default_track: Track = config.default_track.into();
+        let next_track: Track = config.next_track.into();
         Self {
             input: String::new(),
             cursor: 0,
-            last_response: "ready".into(),
-            file_path: "/apps/scope/tui/aud.m4a".into(),
-            track: Track::demo(),
+            last_response: config.ready_response,
+            file_path: config.default_file_path.clone(),
+            track: default_track.clone(),
             playing: false,
             muted: false,
-            volume: 50,
-            gain: 0,
-            pitch: 0,
-            progress_secs: 84,
-            duration_secs: 227,
-            labels: default_labels(227),
-            loop_range: Some((0, 73)),
-            logs: vec![
-                "TUI demo is ready.".into(),
-                "Playback, recording, editing, and saving are visual only for now.".into(),
-            ],
+            volume: config.initial_volume,
+            gain: config.initial_gain,
+            pitch: config.initial_pitch,
+            progress_secs: config.initial_progress_secs,
+            duration_secs: config.default_duration_secs,
+            labels: default_labels(config.default_duration_secs),
+            loop_range: config.initial_loop_range,
+            logs: config.logs,
             spinner_idx: 0,
             recording: false,
             playlist_visible: false,
             playlist_scroll: 0,
-            playlist_entries: PlaylistEntry::demo_folder(500),
+            playlist_entries: config
+                .playlist_entries
+                .into_iter()
+                .map(Into::into)
+                .collect(),
             scope_mode: None,
             scope_phase: 0.0,
             started_at: now,
@@ -162,11 +218,17 @@ impl Default for App {
             last_tick: now,
             last_progress_tick: now,
             should_quit: false,
+            default_file_path: config.default_file_path,
+            next_file_path: config.next_file_path,
+            default_track,
+            next_track,
+            default_progress_secs: config.initial_progress_secs,
+            next_progress_secs: config.next_progress_secs,
+            default_duration_secs: config.default_duration_secs,
+            next_duration_secs: config.next_duration_secs,
         }
     }
-}
 
-impl App {
     fn run(mut self, terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<()> {
         while !self.should_quit {
             terminal.draw(|frame| self.draw(frame))?;
@@ -1121,6 +1183,10 @@ impl App {
             .border_set(border::ROUNDED)
             .border_style(Style::default().fg(Color::DarkGray));
         let inner = inset_x(block.inner(area), 1);
+        if inner.height == 0 {
+            return;
+        }
+
         frame.render_widget(block, area);
 
         let visible = inner.height as usize;
@@ -1233,20 +1299,20 @@ impl App {
     }
 
     fn next_track(&mut self) {
-        self.track = Track::next_demo();
-        self.file_path = "/apps/scope/tui/wide-demo.flac".into();
-        self.progress_secs = 24;
-        self.duration_secs = 196;
-        self.labels = default_labels(196);
+        self.track = self.next_track.clone();
+        self.file_path.clone_from(&self.next_file_path);
+        self.progress_secs = self.next_progress_secs;
+        self.duration_secs = self.next_duration_secs;
+        self.labels = default_labels(self.next_duration_secs);
         self.respond("next: loaded demo metadata only");
     }
 
     fn prev_track(&mut self) {
-        self.track = Track::demo();
-        self.file_path = "/apps/scope/tui/aud.m4a".into();
-        self.progress_secs = 84;
-        self.duration_secs = 227;
-        self.labels = default_labels(227);
+        self.track = self.default_track.clone();
+        self.file_path.clone_from(&self.default_file_path);
+        self.progress_secs = self.default_progress_secs;
+        self.duration_secs = self.default_duration_secs;
+        self.labels = default_labels(self.default_duration_secs);
         self.respond("prev: restored first demo metadata");
     }
 
@@ -1618,30 +1684,17 @@ struct Track {
     size: String,
 }
 
-impl Track {
-    fn demo() -> Self {
+impl From<TrackData> for Track {
+    fn from(track: TrackData) -> Self {
         Self {
-            file: "aud.mp4".into(),
-            album: "scope".into(),
-            artist: "tui".into(),
-            codec: "AAC (LC)".into(),
-            bitrate: "256 kbps".into(),
-            sample_rate: "44.1 kHz".into(),
-            channels: "stereo".into(),
-            size: "5.21 MB".into(),
-        }
-    }
-
-    fn next_demo() -> Self {
-        Self {
-            file: "wide-demo.flac".into(),
-            album: "terminal sketches".into(),
-            artist: "player lab".into(),
-            codec: "FLAC".into(),
-            bitrate: "lossless".into(),
-            sample_rate: "48 kHz".into(),
-            channels: "stereo".into(),
-            size: "18.04 MB".into(),
+            file: track.file,
+            album: track.album,
+            artist: track.artist,
+            codec: track.codec,
+            bitrate: track.bitrate,
+            sample_rate: track.sample_rate,
+            channels: track.channels,
+            size: track.size,
         }
     }
 }
@@ -1801,35 +1854,15 @@ struct PlaylistEntry {
     size: String,
 }
 
-impl PlaylistEntry {
-    fn demo_folder(count: usize) -> Vec<Self> {
-        (1..=count)
-            .map(|index| {
-                let ext = match index % 5 {
-                    0 => "flac",
-                    1 => "m4a",
-                    2 => "mp3",
-                    3 => "wav",
-                    _ => "ogg",
-                };
-                let kind = match ext {
-                    "flac" | "wav" => "lossless",
-                    "m4a" => "aac",
-                    "mp3" => "mpeg",
-                    _ => "vorbis",
-                };
-                let seconds = 95 + ((index * 17) % 260) as u64;
-                let mb = 2.4 + ((index * 37) % 160) as f32 / 10.0;
-
-                Self {
-                    icon: "♪".into(),
-                    name: format!("folder-track-{index:03}.{ext}"),
-                    kind: kind.into(),
-                    duration: fmt_time(seconds),
-                    size: format!("{mb:.1} MB"),
-                }
-            })
-            .collect()
+impl From<PlaylistEntryData> for PlaylistEntry {
+    fn from(entry: PlaylistEntryData) -> Self {
+        Self {
+            icon: entry.icon,
+            name: entry.name,
+            kind: entry.kind,
+            duration: entry.duration,
+            size: entry.size,
+        }
     }
 }
 
