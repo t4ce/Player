@@ -1,4 +1,4 @@
-use player_tui::ui::{PlaylistEntryData, TrackData, UiConfig};
+use player_scope::ui::{PlaylistEntryData, TrackData, UiConfig};
 
 const DEFAULT_FILE_PATH: &str = "/apps/scope/tui/aud.m4a";
 const NEXT_FILE_PATH: &str = "/apps/scope/tui/wide-demo.flac";

@@ -1,12 +1,12 @@
-# player-tui
+# player-scope
 
-`player-tui` is a Ratatui UI-Only for an audio player interface. It focuses on
+`player-scope` is a Ratatui UI-Only for an audio player interface. It focuses on
 layout, command parsing, status feedback, playlist browsing, and scope-style
 visual demos. Media playback, recording, saving, and transcription are
 visual/logged flows only. Expect a finetuned rich Terminal UI where every command waits for you to wire
 as your platform desires.
 
-![player-tui screenshot](doc/Screenshot.png)
+![player-scope screenshot](doc/Screenshot.png)
 
 ## Run
 

@@ -1,5 +1,5 @@
 mod data;
 
 fn main() -> anyhow::Result<()> {
-    player_tui::ui::run(data::config())
+    player_scope::ui::run(data::config())
 }

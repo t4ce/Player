@@ -1,4 +1,4 @@
-//! Library surface for `player-tui`.
+//! Library surface for `player-scope`.
 //!
 //! The library exposes the command parser, dispatch trait, and Ratatui UI
 //! runner so playback, playlist, recording, and editor behavior can be wired
